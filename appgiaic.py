@@ -4,90 +4,132 @@ import tempfile
 import subprocess
 import base64
 
-st.set_page_config(
-    page_title="Python Refactoring Assistant",
-    layout="wide",
-    page_icon="🛠️"
-)
+# App Config
+st.set_page_config(page_title="RefactorPro", page_icon="🧠", layout="wide")
 
-# --- Custom CSS for complex layout ---
+# --- Custom CSS Styling ---
 st.markdown("""
     <style>
+    /* Body Theme */
     body {
         background-color: #0e1117;
-        color: #ffffff;
         font-family: 'Segoe UI', sans-serif;
+        color: #fff;
     }
-    .reportview-container {
-        background: #0e1117;
+
+    /* Sidebar Styling */
+    .css-1d391kg, .css-1lcbmhc {
+        background-color: #1a1d2e !important;
+        color: #ffffff;
     }
-    .sidebar .sidebar-content {
-        padding-top: 2rem;
-        background: #1a1d2e;
-    }
-    .css-1d391kg {padding-top: 3rem;}
-    header {visibility: hidden;}
-    footer {visibility: hidden;}
-    .logo-container {
-        text-align: center;
+
+    /* Header Styling */
+    .main-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background-color: #1f2937;
+        padding: 1rem 2rem;
+        border-radius: 12px;
         margin-bottom: 20px;
     }
-    .footer {
-        text-align: center;
-        padding: 20px;
-        font-size: 0.9rem;
-        color: gray;
-        border-top: 1px solid #333;
-        margin-top: 3rem;
+
+    .main-header h1 {
+        margin: 0;
+        font-size: 2rem;
+        color: #60a5fa;
     }
+
+    .logo {
+        width: 50px;
+    }
+
+    .code-box {
+        background: #1e1e1e;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        font-size: 15px;
+    }
+
     .download-button a {
-        background-color: #1f77b4;
+        background-color: #2563eb;
         color: white;
         padding: 10px 20px;
         text-decoration: none;
         border-radius: 8px;
     }
+
+    .footer {
+        text-align: center;
+        padding: 1rem;
+        color: #888;
+        font-size: 0.9rem;
+        border-top: 1px solid #333;
+        margin-top: 4rem;
+    }
+
+    .stButton>button {
+        border-radius: 10px;
+        background-color: #3b82f6;
+        color: white;
+        font-weight: bold;
+        height: 3rem;
+        width: 100%;
+        font-size: 16px;
+    }
     </style>
 """, unsafe_allow_html=True)
 
-# --- Sidebar/Navbar (Top) ---
+# --- Sidebar ---
 with st.sidebar:
-    st.image("https://yt3.googleusercontent.com/aeRr2sBTduWzH5Xq40kUw4xL8O3iu2yg8_czNTbWwlTnTqBpWJqivSq91MSWZoWZJvMMW4sGQg=s900-c-k-c0x00ffffff-no-rj.png", width=120)
-    st.title("🔧 Code Refactor Pro")
-    st.markdown("Built with `Streamlit`, `Black`, and `Pylint`")
+    st.image("https://cdn-icons-png.flaticon.com/512/4711/4711987.png", width=100)
+    st.title("🔧 RefactorPro")
+    st.markdown("### The AI Code Cleaner")
+    st.markdown("Built with ❤️ using:")
+    st.markdown("- Streamlit\n- Black\n- Pylint")
     st.markdown("---")
-    st.info("Paste messy Python code → Clean & Explain it!")
+    st.markdown("Paste your messy Python code below and get:")
+    st.markdown("- ✅ Cleaned Code")
+    st.markdown("- 📘 Issue Analysis")
+    st.markdown("- 💡 AI-Powered Suggestions")
 
-# --- Main Header ---
-st.markdown("<div class='logo-container'><h1>🛠️ Python Code Refactoring Assistant</h1></div>", unsafe_allow_html=True)
-st.markdown("Paste your messy Python code below. This tool will refactor it, detect common issues, and explain the improvements.")
+# --- Top Header ---
+st.markdown("""
+    <div class="main-header">
+        <h1>🧠 Python Code Refactoring Assistant</h1>
+        <img class="logo" src="https://cdn-icons-png.flaticon.com/512/1828/1828884.png"/>
+    </div>
+""", unsafe_allow_html=True)
 
-# --- Code Input Area ---
-code_input = st.text_area("🔧 Paste your Python code", height=300, key="input_code")
+st.markdown("Paste any messy Python code. This app will auto-refactor it, analyze errors, and explain what's wrong and how to fix it.")
 
-# --- Functions ---
+# --- Input Code Area ---
+code_input = st.text_area("📝 Your Messy Code", height=300)
+
+# --- Utility Functions ---
 def explain_pylint(output: str):
     explanations = {
-        "unused-import": "🔸 **Unused Import**: Module imported but not used.",
-        "unused-variable": "🔸 **Unused Variable**: Variable declared but never used.",
-        "undefined-variable": "🔸 **Undefined Variable**: Variable used before being defined.",
+        "unused-import": "🔸 **Unused Import**: Imported but not used.",
+        "unused-variable": "🔸 **Unused Variable**: Declared but not used.",
+        "undefined-variable": "🔸 **Undefined Variable**: Used before defining.",
     }
     result = []
     for key, msg in explanations.items():
         if key in output:
             result.append(msg)
-    return "\n".join(result) if result else "✅ No major issues found!"
+    return "\n".join(result) if result else "✅ No major issues detected!"
 
 def download_link(code: str, filename="refactored_code.py"):
     b64 = base64.b64encode(code.encode()).decode()
-    return f'<div class="download-button"><a href="data:file/txt;base64,{b64}" download="{filename}">📥 Download Refactored Code</a></div>'
+    return f'<div class="download-button"><a href="data:file/txt;base64,{b64}" download="{filename}">📥 Download Code</a></div>'
 
-# --- Action Button ---
-if st.button("✨ Refactor & Analyze"):
+# --- Main Action ---
+if st.button("🚀 Refactor & Analyze"):
     if not code_input.strip():
-        st.warning("Please paste some code.")
+        st.warning("Please enter some code.")
     else:
-        with st.spinner("🔄 Refactoring..."):
+        with st.spinner("⏳ Processing code..."):
             try:
                 formatted_code = black.format_str(code_input, mode=black.FileMode())
             except Exception as e:
@@ -103,16 +145,19 @@ if st.button("✨ Refactor & Analyze"):
                 capture_output=True, text=True
             )
 
-        # --- Output Section ---
-        st.markdown("## ✅ Refactored Code")
+        st.markdown("### ✅ Refactored Code")
         st.code(formatted_code, language="python")
         st.markdown(download_link(formatted_code), unsafe_allow_html=True)
 
-        st.markdown("## 🧪 Pylint Report")
+        st.markdown("### 🧪 Detected Issues")
         st.text(result.stdout)
 
-        st.markdown("## 💡 Explanation of Issues")
+        st.markdown("### 💡 Suggestions & Explanations")
         st.markdown(explain_pylint(result.stdout))
 
 # --- Footer ---
-st.markdown("<div class='footer'>🚀 Created by Mehak Alamgir | Streamlit UI/UX Pro Edition</div>", unsafe_allow_html=True)
+st.markdown("""
+    <div class="footer">
+        Made with ❤️ by Mehak Alamgir | RefactorPro © 2025
+    </div>
+""", unsafe_allow_html=True)
