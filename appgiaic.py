@@ -5,12 +5,17 @@ import subprocess
 import tempfile
 import base64
 import re
-import plotly.express as px  # ✅ Replaced Matplotlib with Plotly
+import plotly.express as px
+import random
 import ast
 from radon.complexity import cc_visit
 
 # Set up page configuration
 st.set_page_config(page_title="RefactorPro", page_icon="🧠", layout="wide")
+
+# Improved Title & Description
+st.markdown("<h1 style='text-align: center; color: #3b82f6;'>RefactorPro 🚀</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; font-size: 18px;'>Your AI-powered Python code optimizer. Format, analyze, and improve with ease!</p>", unsafe_allow_html=True)
 
 # Dark Mode Toggle with Session State
 if "dark_mode" not in st.session_state:
@@ -25,7 +30,15 @@ dark_mode_css = """
 body { background-color: #1e293b; color: white; }
 .sidebar .sidebar-content { background-color: #0f172a; }
 .stButton>button { background-color: #3b82f6; color: white; border-radius: 8px; }
-.download-btn { background-color: #10b981; padding: 10px 20px; border-radius: 8px; color: white; text-align: center; font-weight: bold; }
+.download-btn { 
+    background: linear-gradient(to right, #6a11cb, #2575fc); 
+    padding: 10px 20px; 
+    border-radius: 8px; 
+    color: white; 
+    text-align: center; 
+    font-weight: bold; 
+    font-size: 16px;
+}
 .metric-box { border-radius: 8px; padding: 15px; text-align: center; font-weight: bold; font-size: 40px; } /* Enlarged Quality Score */
 </style>
 """
@@ -35,7 +48,15 @@ light_mode_css = """
 body { background-color: white; color: black; }
 .sidebar .sidebar-content { background-color: #e2e8f0; }
 .stButton>button { background-color: #2563eb; color: white; border-radius: 8px; }
-.download-btn { background-color: #059669; padding: 10px 20px; border-radius: 8px; color: white; text-align: center; font-weight: bold; }
+.download-btn { 
+    background: linear-gradient(to right, #6a11cb, #2575fc); 
+    padding: 10px 20px; 
+    border-radius: 8px; 
+    color: white; 
+    text-align: center; 
+    font-weight: bold; 
+    font-size: 16px;
+}
 .metric-box { border-radius: 8px; padding: 15px; text-align: center; font-weight: bold; font-size: 40px; } /* Enlarged Quality Score */
 </style>
 """
@@ -83,22 +104,27 @@ def quality_score(issue_count):
     total_issues = sum(issue_count.values())
     return max(0, 100 - total_issues * 10)
 
-# Analyze complexity
-def analyze_complexity(code):
-    results = cc_visit(code)
-    complexity_scores = {func.name: func.complexity for func in results}
-    return complexity_scores
-
 # Extract used modules from input code
 def extract_imports(code):
     tree = ast.parse(code)
     imports = [node.names[0].name for node in tree.body if isinstance(node, ast.Import)]
     return imports
 
-# Generate module usage graph using Plotly
+# Generate module usage graph using Plotly with unique colors
 def plot_import_usage(imports):
     import_counts = {imp: imports.count(imp) for imp in set(imports)}
-    fig = px.bar(x=list(import_counts.keys()), y=list(import_counts.values()), labels={'x':'Modules', 'y':'Usage Count'}, title="📊 Imported Modules Usage")
+    colors = [f"rgb({random.randint(100,255)}, {random.randint(100,255)}, {random.randint(100,255)})" for _ in import_counts]
+
+    fig = px.bar(
+        x=list(import_counts.keys()), 
+        y=list(import_counts.values()), 
+        labels={'x':'Modules', 'y':'Usage Count'}, 
+        title="📊 Imported Modules Usage",
+        color=list(import_counts.keys()),
+        color_discrete_sequence=colors
+    )
+    
+    fig.update_traces(marker=dict(width=0.4))  # ✅ Slimmer bars
     st.plotly_chart(fig, use_container_width=True)
 
 # Function to create download button
@@ -117,7 +143,6 @@ if st.button("🔧 Refactor Now"):
             cleaned_code, analysis = refactor_code(code_input)
             issues = count_issues(analysis)
             score = quality_score(issues)
-            complexity = analyze_complexity(cleaned_code)
 
         # Refactored code
         st.markdown("#### ✅ Refactored Code")
@@ -133,18 +158,11 @@ if st.button("🔧 Refactor Now"):
         """, unsafe_allow_html=True)
         st.progress(score)
 
-        # **Graph of Used Modules**
+        # Graph of Used Modules (positioned correctly)
+        st.subheader("📊 Module Usage in Code")
         used_imports = extract_imports(code_input)
         if used_imports:
-            st.subheader("📊 Module Usage in Code")
             plot_import_usage(used_imports)
         else:
             st.markdown("⚠️ No imports found in the code.")
 
-        # **Expanded Full Lint Analysis**
-        st.subheader("🔍 Full Lint Analysis")
-        with st.expander("Click to View Detailed Report"):
-            st.code(analysis)
-
-# Footer
-st.markdown("<div class='footer'>RefactorPro © 2025 — Built with ❤️ by Mehak Alamgir</div>", unsafe_allow_html=True)
