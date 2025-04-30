@@ -4,7 +4,6 @@ import subprocess
 import tempfile
 import base64
 import re
-from io import StringIO
 import plotly.graph_objects as go
 
 st.set_page_config(page_title="RefactorPro", page_icon="🧠", layout="wide")
@@ -56,17 +55,26 @@ with st.sidebar:
     st.image("https://cdn-icons-png.flaticon.com/512/4711/4711987.png", width=100)
     st.title("RefactorPro")
     st.markdown("🚀 Clean your Python code with AI\n\n🔍 Analyze & visualize issues\n\n📥 Export clean code")
+    
+    # Add small option: "Clear Code" button
+    if st.button("Clear Code"):
+        st.session_state.code_input = ""
 
 # Title
 st.markdown("<h1 style='text-align:center;'>RefactorPro - Python Code Refactoring Assistant</h1>", unsafe_allow_html=True)
 st.markdown("<p style='text-align:center;'>Paste your code, refactor it, and analyze it like a pro developer.</p>", unsafe_allow_html=True)
 
+# --- Layout: Input & Output side-by-side ---
 col1, col2 = st.columns(2)
 
+# --- Input Code Section ---
 with col1:
     st.subheader("📝 Input Code")
-    code_input = st.text_area("Paste your messy Python code below", height=300, key="input_code")
+    if 'code_input' not in st.session_state:
+        st.session_state.code_input = ""  # Initialize input code state
+    code_input = st.text_area("Paste your messy Python code below", value=st.session_state.code_input, height=300, key="input_code")
 
+# --- Refactored Output Section ---
 def refactor_code(code):
     try:
         formatted = black.format_str(code, mode=black.FileMode())
@@ -99,6 +107,7 @@ def download_button(code):
     href = f'<div class="download"><a href="data:file/txt;base64,{b64}" download="refactored.py">📥 Download Refactored Code</a></div>'
     return href
 
+# --- Refactored Output Section ---
 with col2:
     st.subheader("⚙️ Refactored Output")
 
