@@ -10,6 +10,10 @@ import matplotlib.pyplot as plt
 import ast
 from radon.complexity import cc_visit
 
+# Ensure Matplotlib backend works in Streamlit
+import matplotlib
+matplotlib.use('Agg')  # ✅ Prevents rendering issues
+
 # Set up page configuration
 st.set_page_config(page_title="RefactorPro", page_icon="🧠", layout="wide")
 
