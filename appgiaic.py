@@ -52,7 +52,7 @@ st.markdown("""
 
 # --- Sidebar/Navbar (Top) ---
 with st.sidebar:
-    st.image("https://cdn-icons-png.flaticon.com/512/4711/4711987.png", width=120)
+    st.image("https://yt3.googleusercontent.com/aeRr2sBTduWzH5Xq40kUw4xL8O3iu2yg8_czNTbWwlTnTqBpWJqivSq91MSWZoWZJvMMW4sGQg=s900-c-k-c0x00ffffff-no-rj.png", width=120)
     st.title("🔧 Code Refactor Pro")
     st.markdown("Built with `Streamlit`, `Black`, and `Pylint`")
     st.markdown("---")
