@@ -4,80 +4,115 @@ import tempfile
 import subprocess
 import base64
 
-st.set_page_config(page_title="Python Code Refactoring Assistant", layout="wide")
+st.set_page_config(
+    page_title="Python Refactoring Assistant",
+    layout="wide",
+    page_icon="🛠️"
+)
 
-# Sidebar
-with st.sidebar:
-    st.image("https://cdn-icons-png.flaticon.com/512/4711/4711987.png", width=100)
-    st.markdown("## 🧠 Code Refactoring Tool")
-    st.markdown("Improve messy Python code in one click.")
-    st.markdown("---")
-    st.info("Built with ❤️ using Streamlit, Black & Pylint.")
-
-# Custom CSS
+# --- Custom CSS for complex layout ---
 st.markdown("""
     <style>
-        .main { background-color: #0e1117; color: white; }
-        .stTextArea textarea { background-color: #1e212d; color: white; border-radius: 8px; }
-        .stButton>button { background-color: #4a90e2; color: white; border-radius: 10px; }
-        .css-18e3th9 { padding: 1rem 2rem 2rem 2rem; }
+    body {
+        background-color: #0e1117;
+        color: #ffffff;
+        font-family: 'Segoe UI', sans-serif;
+    }
+    .reportview-container {
+        background: #0e1117;
+    }
+    .sidebar .sidebar-content {
+        padding-top: 2rem;
+        background: #1a1d2e;
+    }
+    .css-1d391kg {padding-top: 3rem;}
+    header {visibility: hidden;}
+    footer {visibility: hidden;}
+    .logo-container {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    .footer {
+        text-align: center;
+        padding: 20px;
+        font-size: 0.9rem;
+        color: gray;
+        border-top: 1px solid #333;
+        margin-top: 3rem;
+    }
+    .download-button a {
+        background-color: #1f77b4;
+        color: white;
+        padding: 10px 20px;
+        text-decoration: none;
+        border-radius: 8px;
+    }
     </style>
 """, unsafe_allow_html=True)
 
-st.title("🛠️ Python Code Refactoring Assistant")
-st.markdown("Paste your **messy Python code**, and this tool will refactor it, analyze issues, and explain everything!")
+# --- Sidebar/Navbar (Top) ---
+with st.sidebar:
+    st.image("https://cdn-icons-png.flaticon.com/512/4711/4711987.png", width=120)
+    st.title("🔧 Code Refactor Pro")
+    st.markdown("Built with `Streamlit`, `Black`, and `Pylint`")
+    st.markdown("---")
+    st.info("Paste messy Python code → Clean & Explain it!")
 
-code_input = st.text_area("🔧 Paste your Python code here", height=300)
+# --- Main Header ---
+st.markdown("<div class='logo-container'><h1>🛠️ Python Code Refactoring Assistant</h1></div>", unsafe_allow_html=True)
+st.markdown("Paste your messy Python code below. This tool will refactor it, detect common issues, and explain the improvements.")
 
+# --- Code Input Area ---
+code_input = st.text_area("🔧 Paste your Python code", height=300, key="input_code")
+
+# --- Functions ---
 def explain_pylint(output: str):
-    """Basic explanation for common pylint errors."""
     explanations = {
-        "unused-import": "🔸 **Unused Import**: You imported a module or function that wasn't used.",
-        "unused-variable": "🔸 **Unused Variable**: You created a variable that was never used.",
-        "undefined-variable": "🔸 **Undefined Variable**: You used a variable that was never defined.",
+        "unused-import": "🔸 **Unused Import**: Module imported but not used.",
+        "unused-variable": "🔸 **Unused Variable**: Variable declared but never used.",
+        "undefined-variable": "🔸 **Undefined Variable**: Variable used before being defined.",
     }
     result = []
     for key, msg in explanations.items():
         if key in output:
             result.append(msg)
-    return "\n".join(result) if result else "✅ No critical issues found!"
+    return "\n".join(result) if result else "✅ No major issues found!"
 
 def download_link(code: str, filename="refactored_code.py"):
-    """Generate a download link."""
     b64 = base64.b64encode(code.encode()).decode()
-    return f'<a href="data:file/txt;base64,{b64}" download="{filename}">📥 Download Refactored Code</a>'
+    return f'<div class="download-button"><a href="data:file/txt;base64,{b64}" download="{filename}">📥 Download Refactored Code</a></div>'
 
+# --- Action Button ---
 if st.button("✨ Refactor & Analyze"):
     if not code_input.strip():
-        st.warning("Please paste some code first.")
+        st.warning("Please paste some code.")
     else:
-        # Format code with Black
-        try:
-            formatted_code = black.format_str(code_input, mode=black.FileMode())
-        except Exception as e:
-            st.error(f"Black Formatting Error: {e}")
-            formatted_code = code_input
+        with st.spinner("🔄 Refactoring..."):
+            try:
+                formatted_code = black.format_str(code_input, mode=black.FileMode())
+            except Exception as e:
+                st.error(f"Formatting error: {e}")
+                formatted_code = code_input
 
-        st.success("✅ Code Refactored Successfully!")
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".py", mode="w") as tmp_file:
+                tmp_file.write(formatted_code)
+                tmp_path = tmp_file.name
 
-        # Save to temp file
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".py", mode="w") as tmp_file:
-            tmp_file.write(formatted_code)
-            tmp_path = tmp_file.name
+            result = subprocess.run(
+                ["pylint", tmp_path, "--disable=all", "--enable=unused-import,unused-variable,undefined-variable"],
+                capture_output=True, text=True
+            )
 
-        # Run pylint
-        result = subprocess.run(
-            ["pylint", tmp_path, "--disable=all", "--enable=unused-import,unused-variable,undefined-variable"],
-            capture_output=True, text=True
-        )
-
-        # Output
-        st.subheader("📌 Refactored Code")
+        # --- Output Section ---
+        st.markdown("## ✅ Refactored Code")
         st.code(formatted_code, language="python")
         st.markdown(download_link(formatted_code), unsafe_allow_html=True)
 
-        st.subheader("🧪 Pylint Issues Found")
-        st.markdown(f"```\n{result.stdout}\n```")
+        st.markdown("## 🧪 Pylint Report")
+        st.text(result.stdout)
 
-        st.subheader("💡 Explanation of Issues")
+        st.markdown("## 💡 Explanation of Issues")
         st.markdown(explain_pylint(result.stdout))
+
+# --- Footer ---
+st.markdown("<div class='footer'>🚀 Created by Mehak Alamgir | Streamlit UI/UX Pro Edition</div>", unsafe_allow_html=True)
