@@ -69,24 +69,15 @@ with st.sidebar:
     if st.button("Clear Code"):
         st.session_state.code_input = ""
         
-    if st.button("Download Refactored Code"):
-        # Functionality to download code
-        if 'code_input' in st.session_state:
-            st.markdown(download_button(st.session_state.code_input), unsafe_allow_html=True)
-
 # Title
 st.markdown("<h1 style='text-align:center;'>RefactorPro - Python Code Refactoring Assistant</h1>", unsafe_allow_html=True)
 st.markdown("<p style='text-align:center;'>Paste your code, refactor it, and analyze it like a pro developer.</p>", unsafe_allow_html=True)
 
-# Layout with side-by-side input/output
-col1, col2 = st.columns(2)
-
 # Input Code Section
-with col1:
-    st.subheader("📝 Input Code")
-    if 'code_input' not in st.session_state:
-        st.session_state.code_input = ""  # Initialize input code state
-    code_input = st.text_area("Paste your messy Python code below", value=st.session_state.code_input, height=300, key="input_code")
+st.subheader("📝 Input Code")
+if 'code_input' not in st.session_state:
+    st.session_state.code_input = ""  # Initialize input code state
+code_input = st.text_area("Paste your messy Python code below", value=st.session_state.code_input, height=300, key="input_code")
 
 # Refactor Code Function
 def refactor_code(code):
@@ -125,40 +116,39 @@ def download_button(code):
     return href
 
 # Refactored Output Section
-with col2:
-    st.subheader("⚙️ Refactored Output")
+st.subheader("⚙️ Refactored Output")
 
-    if st.button("🔧 Refactor Now"):
-        if not code_input.strip():
-            st.warning("Please paste some Python code.")
-        else:
-            cleaned_code, analysis = refactor_code(code_input)
-            issues = count_issues(analysis)
-            score = quality_score(issues)
+if st.button("🔧 Refactor Now"):
+    if not code_input.strip():
+        st.warning("Please paste some Python code.")
+    else:
+        cleaned_code, analysis = refactor_code(code_input)
+        issues = count_issues(analysis)
+        score = quality_score(issues)
 
-            # Refactored code
-            st.markdown("#### ✅ Refactored Code")
-            st.code(cleaned_code, language="python")
-            st.markdown(download_button(cleaned_code), unsafe_allow_html=True)
+        # Refactored code
+        st.markdown("#### ✅ Refactored Code")
+        st.code(cleaned_code, language="python")
+        st.markdown(download_button(cleaned_code), unsafe_allow_html=True)
 
-            # Issue Stats
-            st.markdown("#### 📊 Code Issue Summary")
-            st.write(issues)
+        # Issue Stats
+        st.markdown("#### 📊 Code Issue Summary")
+        st.write(issues)
 
-            # Graph (More Colorful)
-            fig = go.Figure(data=[
-                go.Pie(labels=list(issues.keys()), values=list(issues.values()), hole=0.4, marker_colors=["#3b82f6", "#34d399", "#fbbf24"])
-            ])
-            fig.update_layout(title_text="Code Issue Breakdown")
-            st.plotly_chart(fig, use_container_width=True)
+        # Graph (More Colorful)
+        fig = go.Figure(data=[
+            go.Pie(labels=list(issues.keys()), values=list(issues.values()), hole=0.4, marker_colors=["#3b82f6", "#34d399", "#fbbf24"])
+        ])
+        fig.update_layout(title_text="Code Issue Breakdown")
+        st.plotly_chart(fig, use_container_width=True)
 
-            # Quality Score
-            st.markdown(f"### 💯 Code Quality Score: `{score}/100`")
-            st.progress(score)
+        # Quality Score
+        st.markdown(f"### 💯 Code Quality Score: `{score}/100`")
+        st.progress(score)
 
-            # Raw Analysis (Expanded View)
-            with st.expander("🔍 Full Lint Analysis"):
-                st.code(analysis)
+        # Raw Analysis (Expanded View)
+        with st.expander("🔍 Full Lint Analysis"):
+            st.code(analysis)
 
 # Footer
 st.markdown("<div class='footer'>RefactorPro © 2025 — Built with ❤️ by Mehak Alamgir</div>", unsafe_allow_html=True)
