@@ -1,4 +1,7 @@
 streamlit
 black
+isort
 pylint
+flake8
+radon
 plotly
