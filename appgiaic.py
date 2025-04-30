@@ -23,6 +23,9 @@ dark_mode_css = """
 body { background-color: #1e293b; color: white; }
 .sidebar .sidebar-content { background-color: #0f172a; }
 .stButton>button { background-color: #3b82f6; color: white; }
+.metric-box { border-radius: 8px; padding: 15px; text-align: center; font-weight: bold; }
+.metric-title { font-size: 18px; margin-bottom: 10px; }
+.metric-score { font-size: 24px; font-weight: bold; color: #10b981; }
 </style>
 """
 
@@ -31,6 +34,9 @@ light_mode_css = """
 body { background-color: white; color: black; }
 .sidebar .sidebar-content { background-color: #e2e8f0; }
 .stButton>button { background-color: #2563eb; color: white; }
+.metric-box { border-radius: 8px; padding: 15px; text-align: center; font-weight: bold; }
+.metric-title { font-size: 18px; margin-bottom: 10px; }
+.metric-score { font-size: 24px; font-weight: bold; color: #059669; }
 </style>
 """
 
@@ -111,9 +117,20 @@ if st.button("🔧 Refactor Now"):
         st.code(cleaned_code, language="python")
         st.markdown(download_button(cleaned_code), unsafe_allow_html=True)
 
-        # Issue Stats
-        st.markdown("#### 📊 Code Issue Summary")
-        st.write(issues)
+        # Improved Code Quality Score Display
+        st.markdown("""
+            <div class="metric-box">
+                <div class="metric-title">💯 Code Quality Score</div>
+                <div class="metric-score">{}</div>
+            </div>
+        """.format(score), unsafe_allow_html=True)
+        st.progress(score)
+
+        # Improved Issue Breakdown UI
+        col1, col2, col3 = st.columns(3)
+        col1.metric(label="🚀 Unused Imports", value=issues["Unused Imports"])
+        col2.metric(label="⚠️ Unused Variables", value=issues["Unused Variables"])
+        col3.metric(label="🔍 Undefined Variables", value=issues["Undefined Variables"])
 
         # Complexity Stats
         st.markdown("#### ⚡ Function Complexity Analysis")
@@ -136,10 +153,6 @@ if st.button("🔧 Refactor Now"):
             template="plotly_dark" if st.session_state.dark_mode else "plotly_white"
         )
         st.plotly_chart(fig, use_container_width=True)
-
-        # Quality Score
-        st.markdown(f"### 💯 Code Quality Score: `{score}/100`")
-        st.progress(score)
 
         # Raw Analysis (Expanded View)
         with st.expander("🔍 Full Lint Analysis"):
