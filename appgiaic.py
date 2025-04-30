@@ -5,14 +5,9 @@ import subprocess
 import tempfile
 import base64
 import re
-import plotly.graph_objects as go
-import matplotlib.pyplot as plt
+import plotly.express as px  # ✅ Replaced Matplotlib with Plotly
 import ast
 from radon.complexity import cc_visit
-
-# Ensure Matplotlib backend works in Streamlit
-import matplotlib
-matplotlib.use('Agg')  # ✅ Prevents rendering issues
 
 # Set up page configuration
 st.set_page_config(page_title="RefactorPro", page_icon="🧠", layout="wide")
@@ -100,15 +95,11 @@ def extract_imports(code):
     imports = [node.names[0].name for node in tree.body if isinstance(node, ast.Import)]
     return imports
 
-# Generate module usage graph
+# Generate module usage graph using Plotly
 def plot_import_usage(imports):
-    fig, ax = plt.subplots()
     import_counts = {imp: imports.count(imp) for imp in set(imports)}
-    ax.bar(import_counts.keys(), import_counts.values(), color="skyblue")
-    ax.set_xlabel("Modules")
-    ax.set_ylabel("Usage Count")
-    ax.set_title("📊 Imported Modules Usage")
-    st.pyplot(fig)
+    fig = px.bar(x=list(import_counts.keys()), y=list(import_counts.values()), labels={'x':'Modules', 'y':'Usage Count'}, title="📊 Imported Modules Usage")
+    st.plotly_chart(fig, use_container_width=True)
 
 # Function to create download button
 def download_button(code):
@@ -134,12 +125,12 @@ if st.button("🔧 Refactor Now"):
         st.markdown(download_button(cleaned_code), unsafe_allow_html=True)
 
         # Enlarged Quality Score Display
-        st.markdown("""
+        st.markdown(f"""
             <div class="metric-box">
                 <div class="metric-title">💯 Code Quality Score</div>
-                <div class="metric-score">{}</div>
+                <div class="metric-score">{score}</div>
             </div>
-        """.format(score), unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
         st.progress(score)
 
         # **Graph of Used Modules**
