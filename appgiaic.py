@@ -1,4 +1,3 @@
-
 import streamlit as st
 import black
 import isort
@@ -12,90 +11,30 @@ from radon.complexity import cc_visit
 # Set up page configuration
 st.set_page_config(page_title="RefactorPro", page_icon="🧠", layout="wide")
 
-# Dark Mode Toggle
-mode = st.toggle("🌙 Dark Mode", value=True)
+# Dark Mode Toggle with Session State
+if "dark_mode" not in st.session_state:
+    st.session_state.dark_mode = True  # Default to dark mode
+
+if st.button("🌙 Toggle Dark Mode" if st.session_state.dark_mode else "☀️ Toggle Light Mode"):
+    st.session_state.dark_mode = not st.session_state.dark_mode
+
 dark_mode_css = """
 <style>
-body {
-    background-color: #1e293b;
-    color: white;
-    font-family: 'Segoe UI', sans-serif;
-}
-.sidebar .sidebar-content {
-    background-color: #0f172a;
-}
-h1, h2, h3, h4 {
-    color: #60a5fa;
-}
-.footer {
-    text-align: center;
-    margin-top: 2rem;
-    padding: 1rem;
-    color: #94a3b8;
-    border-top: 1px solid #475569;
-}
-.stButton>button {
-    background-color: #3b82f6;
-    color: white;
-    border-radius: 8px;
-    height: 3rem;
-    font-size: 16px;
-    font-weight: bold;
-}
-.download {
-    margin-top: 1rem;
-}
-.download a {
-    background-color: #10b981;
-    padding: 10px 20px;
-    border-radius: 8px;
-    text-decoration: none;
-    color: white;
-}
-.stTextArea>div>div>textarea {
-    background-color: #334155;
-    color: white;
-    border: 1px solid #475569;
-}
-.stProgress>div {
-    background-color: #3b82f6;
-}
-</style>
-"""
-light_mode_css = """
-<style>
-body {
-    background-color: white;
-    color: black;
-}
-.sidebar .sidebar-content {
-    background-color: #e2e8f0;
-}
-h1, h2, h3, h4 {
-    color: #2563eb;
-}
-.footer {
-    text-align: center;
-    margin-top: 2rem;
-    padding: 1rem;
-    color: #64748b;
-    border-top: 1px solid #94a3b8;
-}
-.stButton>button {
-    background-color: #2563eb;
-    color: white;
-    border-radius: 8px;
-    height: 3rem;
-    font-size: 16px;
-    font-weight: bold;
-}
-.download a {
-    background-color: #059669;
-}
+body { background-color: #1e293b; color: white; }
+.sidebar .sidebar-content { background-color: #0f172a; }
+.stButton>button { background-color: #3b82f6; color: white; }
 </style>
 """
 
-st.markdown(dark_mode_css if mode else light_mode_css, unsafe_allow_html=True)
+light_mode_css = """
+<style>
+body { background-color: white; color: black; }
+.sidebar .sidebar-content { background-color: #e2e8f0; }
+.stButton>button { background-color: #2563eb; color: white; }
+</style>
+"""
+
+st.markdown(dark_mode_css if st.session_state.dark_mode else light_mode_css, unsafe_allow_html=True)
 
 # Sidebar
 with st.sidebar:
@@ -126,9 +65,7 @@ def refactor_code(code):
         tmp_file.write(formatted_code)
         tmp_path = tmp_file.name
 
-    result = subprocess.run(
-        ["flake8", tmp_path], capture_output=True, text=True
-    )
+    result = subprocess.run(["flake8", tmp_path], capture_output=True, text=True)
     return formatted_code, result.stdout
 
 # Count issues from lint result
@@ -182,7 +119,7 @@ if st.button("🔧 Refactor Now"):
         st.markdown("#### ⚡ Function Complexity Analysis")
         st.write(complexity)
 
-        # Bar Chart
+        # Fixed Graph Rendering
         fig = go.Figure(data=[
             go.Bar(
                 x=list(issues.keys()),
@@ -192,7 +129,12 @@ if st.button("🔧 Refactor Now"):
                 marker_color=["#3b82f6", "#34d399", "#fbbf24"]
             )
         ])
-        fig.update_layout(title_text="Code Issue Breakdown", xaxis_title="Issue Type", yaxis_title="Count")
+        fig.update_layout(
+            title="📊 Code Issue Breakdown",
+            xaxis_title="Issue Type",
+            yaxis_title="Count",
+            template="plotly_dark" if st.session_state.dark_mode else "plotly_white"
+        )
         st.plotly_chart(fig, use_container_width=True)
 
         # Quality Score
