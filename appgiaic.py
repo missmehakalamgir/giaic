@@ -124,7 +124,7 @@ def plot_import_usage(imports):
         color_discrete_sequence=colors
     )
     
-    fig.update_traces(marker=dict(width=0.4))  # ✅ Slimmer bars
+    fig.update_layout(bargap=0.2)  # ✅ Slimmer bars with spacing
     st.plotly_chart(fig, use_container_width=True)
 
 # Function to create download button
@@ -158,11 +158,10 @@ if st.button("🔧 Refactor Now"):
         """, unsafe_allow_html=True)
         st.progress(score)
 
-        # Graph of Used Modules (positioned correctly)
+        # Graph of Used Modules
         st.subheader("📊 Module Usage in Code")
         used_imports = extract_imports(code_input)
         if used_imports:
             plot_import_usage(used_imports)
         else:
             st.markdown("⚠️ No imports found in the code.")
-
