@@ -1,6 +1,4 @@
-Sure! Here’s the full upgraded version of your Streamlit app with all the enhancements integrated:
 
-```python
 import streamlit as st
 import black
 import isort
