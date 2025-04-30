@@ -4,5 +4,4 @@ isort
 flake8
 radon
 plotly
-matplotlib
 ast
