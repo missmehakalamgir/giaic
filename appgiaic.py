@@ -205,4 +205,3 @@ if st.button("🔧 Refactor Now"):
 
 # Footer
 st.markdown("<div class='footer'>RefactorPro © 2025 — Built with ❤️ by Mehak Alamgir</div>", unsafe_allow_html=True)
-```
