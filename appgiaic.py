@@ -68,7 +68,7 @@ with st.sidebar:
     # Added options in the sidebar for extra functionality
     if st.button("Clear Code"):
         st.session_state.code_input = ""
-        
+
 # Title
 st.markdown("<h1 style='text-align:center;'>RefactorPro - Python Code Refactoring Assistant</h1>", unsafe_allow_html=True)
 st.markdown("<p style='text-align:center;'>Paste your code, refactor it, and analyze it like a pro developer.</p>", unsafe_allow_html=True)
@@ -135,11 +135,17 @@ if st.button("🔧 Refactor Now"):
         st.markdown("#### 📊 Code Issue Summary")
         st.write(issues)
 
-        # Graph (More Colorful)
+        # Bar Chart
         fig = go.Figure(data=[
-            go.Pie(labels=list(issues.keys()), values=list(issues.values()), hole=0.4, marker_colors=["#3b82f6", "#34d399", "#fbbf24"])
+            go.Bar(
+                x=list(issues.keys()),
+                y=list(issues.values()),
+                text=list(issues.values()),
+                textposition='auto',
+                marker_color=["#3b82f6", "#34d399", "#fbbf24"]
+            )
         ])
-        fig.update_layout(title_text="Code Issue Breakdown")
+        fig.update_layout(title_text="Code Issue Breakdown", xaxis_title="Issue Type", yaxis_title="Count")
         st.plotly_chart(fig, use_container_width=True)
 
         # Quality Score
