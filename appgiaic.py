@@ -15,17 +15,17 @@ st.set_page_config(page_title="RefactorPro", page_icon="🧠", layout="wide")
 if "dark_mode" not in st.session_state:
     st.session_state.dark_mode = True  # Default to dark mode
 
-if st.button("🌙 Toggle Dark Mode" if st.session_state.dark_mode else "☀️ Toggle Light Mode"):
+toggle_text = "🌙 Enable Dark Mode" if not st.session_state.dark_mode else "☀️ Enable Light Mode"
+if st.button(toggle_text):
     st.session_state.dark_mode = not st.session_state.dark_mode
 
 dark_mode_css = """
 <style>
 body { background-color: #1e293b; color: white; }
 .sidebar .sidebar-content { background-color: #0f172a; }
-.stButton>button { background-color: #3b82f6; color: white; }
+.stButton>button { background-color: #3b82f6; color: white; border-radius: 8px; }
+.download-btn { background-color: #10b981; padding: 10px 20px; border-radius: 8px; color: white; text-align: center; font-weight: bold; }
 .metric-box { border-radius: 8px; padding: 15px; text-align: center; font-weight: bold; }
-.metric-title { font-size: 18px; margin-bottom: 10px; }
-.metric-score { font-size: 24px; font-weight: bold; color: #10b981; }
 </style>
 """
 
@@ -33,10 +33,9 @@ light_mode_css = """
 <style>
 body { background-color: white; color: black; }
 .sidebar .sidebar-content { background-color: #e2e8f0; }
-.stButton>button { background-color: #2563eb; color: white; }
+.stButton>button { background-color: #2563eb; color: white; border-radius: 8px; }
+.download-btn { background-color: #059669; padding: 10px 20px; border-radius: 8px; color: white; text-align: center; font-weight: bold; }
 .metric-box { border-radius: 8px; padding: 15px; text-align: center; font-weight: bold; }
-.metric-title { font-size: 18px; margin-bottom: 10px; }
-.metric-score { font-size: 24px; font-weight: bold; color: #059669; }
 </style>
 """
 
@@ -49,10 +48,6 @@ with st.sidebar:
     st.markdown("🚀 Clean your Python code with AI\n🔍 Analyze & visualize issues\n📥 Export clean code")
     if st.button("Clear Code"):
         st.session_state.code_input = ""
-
-# Title
-st.markdown("<h1 style='text-align:center;'>RefactorPro - Python Code Refactoring Assistant</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align:center;'>Paste your code, refactor it, and analyze it like a pro developer.</p>", unsafe_allow_html=True)
 
 # Input Code Section
 st.subheader("📝 Input Code")
@@ -96,8 +91,7 @@ def analyze_complexity(code):
 # Function to create download button
 def download_button(code):
     b64 = base64.b64encode(code.encode()).decode()
-    href = f'<div class="download"><a href="data:file/txt;base64,{b64}" download="refactored.py">📥 Download Refactored Code</a></div>'
-    return href
+    return f'<div class="download-btn"><a href="data:file/txt;base64,{b64}" download="refactored.py">📥 Download Refactored Code</a></div>'
 
 # Refactored Output Section
 st.subheader("⚙️ Refactored Output")
@@ -117,7 +111,7 @@ if st.button("🔧 Refactor Now"):
         st.code(cleaned_code, language="python")
         st.markdown(download_button(cleaned_code), unsafe_allow_html=True)
 
-        # Improved Code Quality Score Display
+        # **Improved Code Quality Score UI**
         st.markdown("""
             <div class="metric-box">
                 <div class="metric-title">💯 Code Quality Score</div>
@@ -126,36 +120,23 @@ if st.button("🔧 Refactor Now"):
         """.format(score), unsafe_allow_html=True)
         st.progress(score)
 
-        # Improved Issue Breakdown UI
+        # **Issue Breakdown Updated**
+        st.markdown("#### 🚀 Code Issue Summary")
         col1, col2, col3 = st.columns(3)
-        col1.metric(label="🚀 Unused Imports", value=issues["Unused Imports"])
+        col1.metric(label="📌 Unused Imports", value=issues["Unused Imports"])
         col2.metric(label="⚠️ Unused Variables", value=issues["Unused Variables"])
-        col3.metric(label="🔍 Undefined Variables", value=issues["Undefined Variables"])
+        col3.metric(label="🚨 Undefined Variables", value=issues["Undefined Variables"])
 
-        # Complexity Stats
-        st.markdown("#### ⚡ Function Complexity Analysis")
-        st.write(complexity)
-
-        # Fixed Graph Rendering
-        fig = go.Figure(data=[
-            go.Bar(
-                x=list(issues.keys()),
-                y=list(issues.values()),
-                text=list(issues.values()),
-                textposition="auto",
-                marker_color=["#3b82f6", "#34d399", "#fbbf24"]
-            )
-        ])
-        fig.update_layout(
-            title="📊 Code Issue Breakdown",
-            xaxis_title="Issue Type",
-            yaxis_title="Count",
-            template="plotly_dark" if st.session_state.dark_mode else "plotly_white"
-        )
+        # **Pie Chart for Code Issues**
+        total_issues = sum(issues.values())
+        percentages = [round((v / total_issues) * 100, 2) if total_issues else 0 for v in issues.values()]
+        fig = go.Figure(data=[go.Pie(labels=list(issues.keys()), values=percentages, hole=0.4)])
+        fig.update_layout(title="📊 Issue Breakdown (Percentage)", template="plotly_dark" if st.session_state.dark_mode else "plotly_white")
         st.plotly_chart(fig, use_container_width=True)
 
-        # Raw Analysis (Expanded View)
-        with st.expander("🔍 Full Lint Analysis"):
+        # **Expanded Full Lint Analysis**
+        st.subheader("🔍 Full Lint Analysis")
+        with st.expander("Click to View Detailed Report"):
             st.code(analysis)
 
 # Footer
