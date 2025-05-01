@@ -1,4 +1,3 @@
-# RefactorPro - Full UI/UX Upgraded Version
 import streamlit as st
 import black
 import isort
@@ -63,7 +62,7 @@ if "code_input" not in st.session_state:
     st.session_state.code_input = ""
 
 # Tabs for workflow
-tabs = st.tabs(["📝 Code Input", "⚙️ Refactored Output", "🎯 Scorecard", "📊 Module Graph"])
+tabs = st.tabs(["📝 Code Input", "⚙️ Refactored Output", "🎯 Scorecard", "📊 Module Graph", "✨ Code Optimization Suggestions"])
 
 # --- Code Input Tab --- #
 with tabs[0]:
@@ -121,6 +120,24 @@ def download_button(code):
     </div>
     '''
 
+# Code Optimization Suggestions Function
+def optimize_code_suggestions(code):
+    suggestions = []
+    
+    # Example checks for code optimization suggestions
+    if "for i in range(len(list))" in code:
+        suggestions.append("Use 'for item in list' instead of 'for i in range(len(list))' for better readability.")
+    
+    if "== None" in code:
+        suggestions.append("Use 'is None' instead of '== None' for better performance and readability.")
+    
+    if len(re.findall(r"print\(", code)) > 3:
+        suggestions.append("Avoid excessive 'print' statements. Consider logging or using a debugger for better performance.")
+    
+    # Add more checks as needed
+
+    return suggestions
+
 # Refactor Button
 if st.button("⚙️ Refactor Now"):
     if not code_input.strip():
@@ -130,6 +147,9 @@ if st.button("⚙️ Refactor Now"):
         issues = count_issues(analysis)
         score = quality_score(issues)
         used_imports = extract_imports(code_input)
+        
+        # Get optimization suggestions
+        suggestions = optimize_code_suggestions(cleaned_code)
 
         with tabs[1]:
             st.markdown("#### ✅ Cleaned & Refactored Code")
@@ -141,6 +161,14 @@ if st.button("⚙️ Refactor Now"):
             st.progress(score)
             st.json(issues)
 
+            # Display optimization suggestions
+            if suggestions:
+                st.markdown("### ✨ Code Optimization Suggestions")
+                for suggestion in suggestions:
+                    st.markdown(f"- {suggestion}")
+            else:
+                st.info("No optimization suggestions available.")
+        
         with tabs[3]:
             if used_imports:
                 plot_import_usage(used_imports)
@@ -151,7 +179,6 @@ if st.button("⚙️ Refactor Now"):
 st.markdown("""
     <div class='footer'>
         RefactorPro &copy; 2025 &mdash; Built with ❤️ by Mehak Alamgir<br>
-        st.markdown("<br><br>", unsafe_allow_html=True)
         <div class='social-icons'>
             <a href="https://github.com/mehakalamgir"><img src="https://cdn-icons-png.flaticon.com/512/25/25231.png"></a>
             <a href="https://linkedin.com/in/mehakalamgir"><img src="https://cdn-icons-png.flaticon.com/512/174/174857.png"></a>
