@@ -190,6 +190,7 @@ if st.button("⚙️ Refactor Now"):
 st.markdown("""
     <div class='footer'>
         RefactorPro &copy; 2025 &mdash; Built with ❤️ by Mehak Alamgir<br>
+        st.markdown("<br><br>", unsafe_allow_html=True)
         <div class='social-icons'>
             <a href="https://github.com/mehakalamgir"><img src="https://cdn-icons-png.flaticon.com/512/25/25231.png"></a>
             <a href="https://linkedin.com/in/mehakalamgir"><img src="https://cdn-icons-png.flaticon.com/512/174/174857.png"></a>
