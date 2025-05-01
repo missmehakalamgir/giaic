@@ -41,7 +41,7 @@ st.markdown("""
 # Title & Animation
 col1, col2 = st.columns([2, 1])
 with col1:
-    st.markdown("<div class='big-title'>RefactorPro 🚀</div>", unsafe_allow_html=True)
+    st.markdown("<div class='big-title'>AI-Powered Python Code Formatter & Optimizer 🚀</div>", unsafe_allow_html=True)
     st.markdown("<div class='subtitle'>Empower your Python code with AI-driven formatting, optimization, and analysis</div>", unsafe_allow_html=True)
 with col2:
     if animation:
