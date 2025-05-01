@@ -30,13 +30,21 @@ animation = load_lottie_url("https://assets10.lottiefiles.com/packages/lf20_j1ad
 # Custom CSS ka section jo UI ko style karta hai
 st.markdown("""
     <style>
+        /* Big title ki styling */
         .big-title {text-align: center; font-size: 3em; color: #2575fc; font-weight: bold;}
+        /* Subtitle ki styling */
         .subtitle {text-align: center; font-size: 20px; color: #444; font-style: italic;}
+        /* Feature box ki styling */
         .feature-box {background: linear-gradient(to right, #6a11cb, #2575fc); padding: 15px; border-radius: 8px; color: white; text-align: center; margin-bottom: 20px;}
+        /* Documentation box ki styling */
         .doc-box {background: linear-gradient(to right, #34d399, #10b981); padding: 15px; border-radius: 8px; color: white; text-align: center;}
+        /* Download button hover effect */
         .download-btn a:hover {transform: scale(1.05); box-shadow: 0px 4px 12px rgba(0,0,0,0.2);}
+        /* Score box ki styling */
         .score-box {background: linear-gradient(to right, #34d399, #10b981); padding: 10px; border-radius: 8px; text-align: center; color: white; font-size: 24px; font-weight: bold;}
+        /* Footer ki styling */
         .footer {text-align: center; font-size: 14px; color: #aaa; margin-top: 40px;}
+        /* Social media icons ki styling */
         .social-icons img {width: 25px; margin: 0 5px; vertical-align: middle;}
     </style>
 """, unsafe_allow_html=True)
@@ -44,7 +52,7 @@ st.markdown("""
 # Page title aur animation display karna
 col1, col2 = st.columns([2, 1])  # Do columns create kar rahe hain
 with col1:
-    st.markdown("<div class='big-title'>AI-Powered Python Code Formatter & Optimizer 🚀</div>", unsafe_allow_html=True)  # Title ko render kar rahe hain
+    st.markdown("<div class='big-title'>RefactorPro 🚀</div>", unsafe_allow_html=True)  # Title ko render kar rahe hain
     st.markdown("<div class='subtitle'>Empower your Python code with AI-driven formatting, optimization, and analysis</div>", unsafe_allow_html=True)  # Subtitle render karna
 with col2:
     if animation:  # Agar animation load ho gaya ho
@@ -147,7 +155,7 @@ def optimize_code_suggestions(code):
         suggestions.append("If you're removing duplicates, consider using 'set()' instead of repeatedly removing elements from a list.")
     if "global " in code:
         suggestions.append("Avoid using 'global' variables. It's better to pass variables as function arguments or return values.")
-    if len(re.findall(r"\b[a-z]{1,2}\b", code)) > 5: #Yeh line check kar rahi hai ki code mein zyada 1 ya 2 letter ke variable names ya words toh nahi hain
+    if len(re.findall(r"\b[a-z]{1,2}\b", code)) > 5:
         suggestions.append("Use descriptive variable names instead of single-letter variables (e.g., 'x', 'y').")
     if "open(" in code and "close()" in code:
         suggestions.append("Use 'with open(...) as file' to automatically handle file closing and exceptions.")
