@@ -54,6 +54,7 @@ with col2:
 with st.sidebar:
     st.markdown("<div class='feature-box'><h2>🔧 Features</h2><p>Refactor, analyze, optimize your code.</p></div>", unsafe_allow_html=True)
     st.markdown("<div class='doc-box'><h3>📘 Documentation</h3><p>Get started with AI-driven optimization.</p></div>", unsafe_allow_html=True)
+    st.markdown("<br><br>", unsafe_allow_html=True)
     if st.button("🗑️ Clear Code", help="Reset your code input"):
         st.session_state.code_input = ""
 
@@ -150,6 +151,7 @@ if st.button("⚙️ Refactor Now"):
 st.markdown("""
     <div class='footer'>
         RefactorPro &copy; 2025 &mdash; Built with ❤️ by Mehak Alamgir<br>
+        st.markdown("<br><br>", unsafe_allow_html=True)
         <div class='social-icons'>
             <a href="https://github.com/mehakalamgir"><img src="https://cdn-icons-png.flaticon.com/512/25/25231.png"></a>
             <a href="https://linkedin.com/in/mehakalamgir"><img src="https://cdn-icons-png.flaticon.com/512/174/174857.png"></a>
