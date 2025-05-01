@@ -13,30 +13,73 @@ from radon.complexity import cc_visit
 # Set up page configuration
 st.set_page_config(page_title="RefactorPro", page_icon="🧠", layout="wide")
 
-# **Refactored Title & Description**
-st.markdown("<h1 style='text-align: center; color: #2575fc;'>RefactorPro 🚀</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; font-size: 18px;'>AI-powered Python code optimizer. Format, analyze, and improve with ease!</p>", unsafe_allow_html=True)
+# Improved Title & Description
+st.markdown("<h1 style='text-align: center; color: #3b82f6;'>RefactorPro 🚀</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; font-size: 18px;'>Your AI-powered Python code optimizer. Format, analyze, and improve with ease!</p>", unsafe_allow_html=True)
 
-# Sidebar Navigation
+# Dark Mode Toggle with Session State
+if "dark_mode" not in st.session_state:
+    st.session_state.dark_mode = True  
+
+toggle_text = "🌙 Enable Dark Mode" if not st.session_state.dark_mode else "☀️ Enable Light Mode"
+if st.button(toggle_text):
+    st.session_state.dark_mode = not st.session_state.dark_mode
+
+dark_mode_css = """
+<style>
+body { background-color: #1e293b; color: white; }
+.sidebar .sidebar-content { background-color: #0f172a; }
+.stButton>button { background-color: #3b82f6; color: white; border-radius: 8px; }
+.download-btn { 
+    background: linear-gradient(to right, #6a11cb, #2575fc); 
+    padding: 10px 20px; 
+    border-radius: 8px; 
+    color: white; 
+    text-align: center; 
+    font-weight: bold; 
+    font-size: 16px;
+}
+.metric-box { border-radius: 8px; padding: 15px; text-align: center; font-weight: bold; font-size: 40px; } /* Enlarged Quality Score */
+</style>
+"""
+
+light_mode_css = """
+<style>
+body { background-color: white; color: black; }
+.sidebar .sidebar-content { background-color: #e2e8f0; }
+.stButton>button { background-color: #2563eb; color: white; border-radius: 8px; }
+.download-btn { 
+    background: linear-gradient(to right, #6a11cb, #2575fc); 
+    padding: 10px 20px; 
+    border-radius: 8px; 
+    color: white; 
+    text-align: center; 
+    font-weight: bold; 
+    font-size: 16px;
+}
+.metric-box { border-radius: 8px; padding: 15px; text-align: center; font-weight: bold; font-size: 40px; } /* Enlarged Quality Score */
+</style>
+"""
+
+st.markdown(dark_mode_css if st.session_state.dark_mode else light_mode_css, unsafe_allow_html=True)
+
+# Sidebar
 with st.sidebar:
     st.image("https://cdn-icons-png.flaticon.com/512/4711/4711987.png", width=100)
     st.title("RefactorPro")
-    st.markdown("🚀 AI-powered Python Refactoring")
-    st.markdown("🔍 Code Analysis & Optimization")
-    st.markdown("📥 Export Clean Code")
-
+    st.markdown("🚀 Clean your Python code with AI\n🔍 Analyze & visualize issues\n📥 Export clean code")
     if st.button("Clear Code"):
         st.session_state.code_input = ""
 
 # Input Code Section
-st.subheader("📝 Paste Your Code")
+st.subheader("📝 Input Code")
 if "code_input" not in st.session_state:
     st.session_state.code_input = ""  
 
-with st.expander("📝 Enter your Python code", expanded=True):
+with st.expander("📝 Paste your Python code here", expanded=True):
     code_input = st.text_area("Code Input", value=st.session_state.code_input, height=300, key="input_code")
 
-# **Function to Refactor Code**
+# Refactor Code Function
 def refactor_code(code):
     sorted_code = isort.code(code)
     formatted_code = black.format_file_contents(sorted_code, fast=False, mode=black.Mode())
@@ -48,7 +91,7 @@ def refactor_code(code):
     result = subprocess.run(["flake8", tmp_path], capture_output=True, text=True)
     return formatted_code, result.stdout
 
-# **Count Issues from Linting**
+# Count issues from lint result
 def count_issues(output):
     return {
         "Unused Imports": len(re.findall(r"unused-import", output)),
@@ -56,108 +99,70 @@ def count_issues(output):
         "Undefined Variables": len(re.findall(r"undefined-variable", output))
     }
 
-# **Calculate Quality Score**
+# Quality score calculation
 def quality_score(issue_count):
     total_issues = sum(issue_count.values())
     return max(0, 100 - total_issues * 10)
 
-# **Extract Imported Modules**
+# Extract used modules from input code
 def extract_imports(code):
     tree = ast.parse(code)
     imports = [node.names[0].name for node in tree.body if isinstance(node, ast.Import)]
     return imports
 
-# **Stylized Module Usage Graph**
+# Generate module usage graph using Plotly with unique colors
 def plot_import_usage(imports):
     import_counts = {imp: imports.count(imp) for imp in set(imports)}
-    colors = [f"rgb({random.randint(50,255)}, {random.randint(50,255)}, {random.randint(50,255)})" for _ in import_counts]
+    colors = [f"rgb({random.randint(100,255)}, {random.randint(100,255)}, {random.randint(100,255)})" for _ in import_counts]
 
     fig = px.bar(
         x=list(import_counts.keys()), 
         y=list(import_counts.values()), 
         labels={'x':'Modules', 'y':'Usage Count'}, 
-        title="📊 Module Usage",
+        title="📊 Imported Modules Usage",
         color=list(import_counts.keys()),
         color_discrete_sequence=colors
     )
     
-    fig.update_layout(bargap=0.3)  # ✅ Slimmer bars with spacing
+    fig.update_traces(marker=dict(width=0.4))  # ✅ Slimmer bars
     st.plotly_chart(fig, use_container_width=True)
 
-# **Download Button Styling**
+# Function to create download button
 def download_button(code):
     b64 = base64.b64encode(code.encode()).decode()
-    return f'''
-    <div style="text-align: center; padding: 10px;">
-        <a href="data:file/txt;base64,{b64}" download="refactored.py" style="
-            background: linear-gradient(to right, #6a11cb, #2575fc); 
-            padding: 12px 20px; 
-            border-radius: 8px; 
-            color: white; 
-            text-align: center; 
-            font-weight: bold; 
-            font-size: 18px; 
-            text-decoration: none;">📥 Download Refactored Code</a>
-    </div>
-    '''
+    return f'<div class="download-btn"><a href="data:file/txt;base64,{b64}" download="refactored.py">📥 Download Refactored Code</a></div>'
 
-# **Refactored Output Section**
+# Refactored Output Section
 st.subheader("⚙️ Refactored Output")
 
-if st.button("🔧 Refactor Now", help="Click to format & analyze your code"):
+if st.button("🔧 Refactor Now"):
     if not code_input.strip():
         st.toast("⚠️ Please paste some Python code", icon="⚠️")
     else:
-        with st.spinner("🔧 Processing..."):
+        with st.spinner("🔧 Refactoring code..."):
             cleaned_code, analysis = refactor_code(code_input)
             issues = count_issues(analysis)
             score = quality_score(issues)
 
-        # **Refactored Code**
-        st.markdown("#### ✅ Cleaned Code")
+        # Refactored code
+        st.markdown("#### ✅ Refactored Code")
         st.code(cleaned_code, language="python")
         st.markdown(download_button(cleaned_code), unsafe_allow_html=True)
 
-        # **Quality Score Display**
+        # Enlarged Quality Score Display
         st.markdown(f"""
-            <div style="text-align: center; font-size: 26px; font-weight: bold; padding: 10px; border-radius: 8px; background: linear-gradient(to right, #34d399, #10b981); color: white;">
-                💯 Code Quality Score: {score}
+            <div class="metric-box">
+                <div class="metric-title">💯 Code Quality Score</div>
+                <div class="metric-score">{score}</div>
             </div>
         """, unsafe_allow_html=True)
         st.progress(score)
 
-        # **Graph of Used Modules**
-        st.subheader("📊 Module Usage Statistics")
+        # Graph of Used Modules (positioned correctly)
+        st.subheader("📊 Module Usage in Code")
         used_imports = extract_imports(code_input)
         if used_imports:
             plot_import_usage(used_imports)
         else:
             st.markdown("⚠️ No imports found in the code.")
 
-# **Floating Action Button (FAB)**
-st.markdown("""
-    <style>
-    .fab-container {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        z-index: 1000;
-    }
-    .fab-button {
-        background: linear-gradient(to right, #ff416c, #ff4b2b);
-        padding: 14px 18px;
-        border-radius: 50px;
-        font-size: 18px;
-        color: white;
-        font-weight: bold;
-        text-align: center;
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-    }
-    </style>
-    <div class="fab-container">
-        <button class="fab-button">🚀 Refactor Now</button>
-    </div>
-""", unsafe_allow_html=True)
-
-# Footer
-st.markdown("<p style='text-align: center;'>RefactorPro © 2025 — Built with ❤️ by Mehak Alamgir</p>", unsafe_allow_html=True)
