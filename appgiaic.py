@@ -17,30 +17,23 @@ st.set_page_config(page_title="RefactorPro", page_icon="🧠", layout="wide")
 st.markdown("<h1 style='text-align: center; color: #2575fc;'>RefactorPro 🚀</h1>", unsafe_allow_html=True)
 st.markdown("<p style='text-align: center; font-size: 18px;'>AI-powered Python code optimizer. Format, analyze, and improve with ease!</p>", unsafe_allow_html=True)
 
-# **Stylized Sidebar Navigation**
+# **Stylized Sidebar**
 with st.sidebar:
-    st.image("https://cdn-icons-png.flaticon.com/512/4711/4711987.png", width=100)
-
     st.markdown("""
-        <div style="padding: 15px; border-radius: 8px; background: linear-gradient(to right, #6a11cb, #2575fc); color: white; text-align: center;">
+        <div style="background: linear-gradient(to right, #6a11cb, #2575fc); padding: 20px; border-radius: 8px; text-align: center; color: white;">
             <h2>🔧 Features</h2>
-            <ul style="list-style-type: none; padding-left: 0;">
-                <li>🚀 AI-powered Python refactoring</li>
-                <li>🔍 Code analysis & optimization</li>
-                <li>📊 Visual module insights</li>
-                <li>📥 Export clean code</li>
-            </ul>
+            <p>Refactor, analyze, optimize your code.</p>
         </div>
     """, unsafe_allow_html=True)
-
+    
     st.markdown("""
-        <div style="padding: 15px; border-radius: 8px; background: linear-gradient(to right, #34d399, #10b981); color: white; text-align: center;">
-            <h2>📘 Documentation</h2>
-            <p>Get started with our AI-powered optimization</p>
+        <div style="background: linear-gradient(to right, #34d399, #10b981); padding: 15px; border-radius: 8px; text-align: center; color: white;">
+            <h3>📘 Documentation</h3>
+            <p>Get started with AI-driven optimization.</p>
         </div>
     """, unsafe_allow_html=True)
 
-    if st.button("Clear Code", help="Reset input"):
+    if st.button("🗑️ Clear Code", help="Reset your code input"):
         st.session_state.code_input = ""
 
 # **Input Code Section**
