@@ -10,19 +10,20 @@ import plotly.express as px
 import random
 import ast
 from radon.complexity import cc_visit
-import streamlit_lottie as st_lottie
-import json
+from streamlit_lottie import st_lottie
+import requests
 
 st.set_page_config(page_title="RefactorPro", page_icon="🧠", layout="wide")
 
-# Load Lottie animation
+# Load Lottie animation from URL
 @st.cache_data
-def load_lottiefile(filepath: str):
-    with open(filepath, "r") as f:
-        return json.load(f)
+def load_lottie_url(url: str):
+    r = requests.get(url)
+    if r.status_code != 200:
+        return None
+    return r.json()
 
-# Load animation
-animation = load_lottiefile("/mnt/data/ai-coding.json")  # Replace with your local JSON Lottie file
+animation = load_lottie_url("https://assets10.lottiefiles.com/packages/lf20_j1adxtyb.json")
 
 # Custom CSS
 st.markdown("""
@@ -44,7 +45,10 @@ with col1:
     st.markdown("<div class='big-title'>RefactorPro 🚀</div>", unsafe_allow_html=True)
     st.markdown("<div class='subtitle'>Empower your Python code with AI-driven formatting, optimization, and analysis</div>", unsafe_allow_html=True)
 with col2:
-    st_lottie.st_lottie(animation, height=200, speed=1, loop=True)
+    if animation:
+        st_lottie(animation, height=200, speed=1, loop=True)
+    else:
+        st.warning("⚠️ Failed to load animation.")
 
 # Sidebar Features & Docs
 with st.sidebar:
