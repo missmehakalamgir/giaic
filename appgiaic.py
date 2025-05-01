@@ -17,7 +17,7 @@ st.set_page_config(page_title="RefactorPro", page_icon="🧠", layout="wide")
 st.markdown("""
     <style>
         body {
-            background-color: #f5f7fa;
+            background-color: black;
             font-family: 'Segoe UI', sans-serif;
         }
         .main h1, .main p, .main h2, .main h3 {
