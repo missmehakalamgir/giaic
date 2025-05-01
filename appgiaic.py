@@ -120,21 +120,34 @@ def download_button(code):
     </div>
     '''
 
-# Code Optimization Suggestions Function
+# Code Optimization Suggestions
 def optimize_code_suggestions(code):
     suggestions = []
-    
-    # Example checks for code optimization suggestions
+
     if "for i in range(len(list))" in code:
         suggestions.append("Use 'for item in list' instead of 'for i in range(len(list))' for better readability.")
-    
     if "== None" in code:
         suggestions.append("Use 'is None' instead of '== None' for better performance and readability.")
-    
     if len(re.findall(r"print\(", code)) > 3:
         suggestions.append("Avoid excessive 'print' statements. Consider logging or using a debugger for better performance.")
-    
-    # Add more checks as needed
+    if "for i in range(len(" in code:
+        suggestions.append("Consider using 'enumerate()' for cleaner loops, e.g., 'for i, item in enumerate(list):'")
+    if "list1 + list2" in code:
+        suggestions.append("Avoid concatenating lists inside loops, as it's inefficient. Use 'list.extend()' or 'append()'.")
+    if "list.remove(" in code:
+        suggestions.append("If you're removing duplicates, consider using 'set()' instead of repeatedly removing elements from a list.")
+    if "global " in code:
+        suggestions.append("Avoid using 'global' variables. It's better to pass variables as function arguments or return values.")
+    if len(re.findall(r"\b[a-z]{1,2}\b", code)) > 5:
+        suggestions.append("Use descriptive variable names instead of single-letter variables (e.g., 'x', 'y').")
+    if "open(" in code and "close()" in code:
+        suggestions.append("Use 'with open(...) as file' to automatically handle file closing and exceptions.")
+    if "if x == None:" in code:
+        suggestions.append("Use default arguments instead of manual 'None' checks in function definitions, e.g., 'def func(x=None):'")
+    if "lambda " in code and len(re.findall(r"lambda", code)) > 3:
+        suggestions.append("Consider replacing redundant lambda functions with regular function definitions.")
+    if "list(map(" in code:
+        suggestions.append("Consider using list comprehensions instead of 'map()' for better readability and performance.")
 
     return suggestions
 
@@ -147,9 +160,6 @@ if st.button("⚙️ Refactor Now"):
         issues = count_issues(analysis)
         score = quality_score(issues)
         used_imports = extract_imports(code_input)
-        
-        # Get optimization suggestions
-        suggestions = optimize_code_suggestions(cleaned_code)
 
         with tabs[1]:
             st.markdown("#### ✅ Cleaned & Refactored Code")
@@ -161,19 +171,20 @@ if st.button("⚙️ Refactor Now"):
             st.progress(score)
             st.json(issues)
 
-            # Display optimization suggestions
-            if suggestions:
-                st.markdown("### ✨ Code Optimization Suggestions")
-                for suggestion in suggestions:
-                    st.markdown(f"- {suggestion}")
-            else:
-                st.info("No optimization suggestions available.")
-        
         with tabs[3]:
             if used_imports:
                 plot_import_usage(used_imports)
             else:
                 st.info("No modules found in the code.")
+
+        with tabs[4]:
+            suggestions = optimize_code_suggestions(code_input)
+            if suggestions:
+                st.markdown("#### 💡 Code Optimization Suggestions")
+                for suggestion in suggestions:
+                    st.markdown(f"- {suggestion}")
+            else:
+                st.info("No optimization suggestions available.")
 
 # Footer with Social Icons
 st.markdown("""
